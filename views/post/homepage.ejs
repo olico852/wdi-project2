@@ -1,0 +1,34 @@
+<div class="row content">
+  <div class="col-sm-2 sidenav">
+    <h1></h1>
+    <p>Hello <%=currentUser.name.firstname%></p>
+    <p>You're a <%=currentUser.role%></p>
+    <p>Your work is found at: <%=currentUser.website%></p>
+    <p><%=currentUser.skillsintro%></p>
+    <p>Contributed <%=currentUser.posts.length%> posts to date</p>
+    <p>Made <%=currentUser.comments.length%> comments to date</p>
+  </div>
+  <div class="col-sm-8 text-left">
+
+    <h1>Latest articles from the stream...</h1>
+    <% articles.forEach(function(item) { %>
+     <hr>
+     <h2><%= item.title %></h2>
+     <h5><span class="glyphicon glyphicon-time"></span><a href=<%="/user/" + item.user%>> By <%= item.user %></a>, <%= item.updated_at %></h5>
+     <h5><span class="label label-danger"><%= item.tags %></span> <span class="label label-primary">Ipsum</span></h5><br>
+     <p><%= item.article %></p>
+     <hr>
+     <% }); %>
+  </div>
+
+  <div class="col-sm-2 sidenav">
+    <h1></h1>
+    <div class="well">
+      <p>filler</p>
+    </div>
+    <div class="well">
+      <p>filler</p>
+    </div>
+  </div>
+</div>
+</div>

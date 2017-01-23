@@ -1,0 +1,32 @@
+<% lists.forEach(function(item) { %>
+
+<h3>Here are your todo item in list: <%= item.lists %></h3>
+    Description: <%= item.description %>
+    <br>Completed? <%= item.completed %>. Update:
+
+    <% if (item.completed === false) { %>
+    <form method="POST" action=<%="/todolist/edit/" + item._id + "?_method=PUT"%>>
+      <button style="display:show; background-color:green" id="statusT" class="btn btn-default" name="completed" type="submit" value="True">True</button>
+      <button style="display:show; background-color:grey" id="statusF" class="btn btn-default" name="completed" type="submit" value="False">False</button>
+      <button style="display:none; background-color:grey" id="statusT2" class="btn btn-default" name="completed" type="submit" value="True">True</button>
+      <button style="display:none; background-color:green" id="statusF2" class="btn btn-default" name="completed" type="submit" value="False">False</button>
+    <%} else {%>
+      <button style="display:hide; background-color:green" id="statusT" class="btn btn-default" name="completed" type="submit" value="True">True</button>
+      <button style="display:hide; background-color:grey" id="statusF" class="btn btn-default" name="completed" type="submit" value="False">False</button>
+      <button style="display:show; background-color:grey" id="statusT2" class="btn btn-default" name="completed" type="submit" value="True">True</button>
+      <button style="display:show; background-color:green" id="statusF2" class="btn btn-default" name="completed" type="submit" value="False">False</button>
+    <% }%>
+    </form>
+
+    <br>
+      <button class="btn btn-default"><a href=<%="/todolist/edit/" + item.name%>>Edit this list/Create Todo Items</a></button>
+
+      <form method="POST" action=<%="/todolist/"  + item._id + "?_method=DELETE"%>>
+            <button class="btn btn-default" name="status" type="submit">Delete this list</button>
+      </form>
+
+    <ul>
+        <li>Todos: <%= item.Todos %></li>
+
+  <% }); %>
+</ul>

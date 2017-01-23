@@ -1,0 +1,44 @@
+
+<p>Create Todo Item in this list</p>
+
+<form method="POST" action=<%="todo/create/" + +?_method=PUT"%>>
+
+  <div class="input-group">
+   Name: <input type="text" class="form-control" name="name" placeholder="" aria-describedby="basic-addon2">
+  </div>
+
+  <div class="input-group">
+    Description: <input type="text" class="form-control" name="description" placeholder="" aria-describedby="basic-addon2">
+  </div>
+
+  <div class="input-group">
+    Completed: <input type="text" class="form-control" name="completed" placeholder="" aria-describedby="basic-addon2">
+  </div>
+
+  <button type="submit">Create</button>
+</form>
+
+<br>
+
+<form method="POST" action="?_method=DELETE">
+  <button type="submit">Delete Todo</button>
+</form>
+
+<p>Update This Todo List</p>
+
+<form method="POST" action="?_method=PUT">
+
+  <div class="input-group">
+    <input type="text" class="form-control" name="name" placeholder="" aria-describedby="basic-addon2">
+  </div>
+
+  <div class="input-group">
+    <input type="text" class="form-control" name="description" placeholder="" aria-describedby="basic-addon2">
+  </div>
+
+  <div class="input-group">
+    <input type="text" class="form-control" name="completed" placeholder="" aria-describedby="basic-addon2">
+  </div>
+
+  <button type="submit">Edit Todo</button>
+</form>
