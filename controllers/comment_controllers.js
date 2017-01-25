@@ -4,89 +4,164 @@ const express = require('express')
 const router = express.Router()
 const flash = require('connect-flash')
 
-
-
 // router.get('/', function (req, res) { // express gets triggered when someone types in '/' which is a request
 //   res.redirect('/' + req.user._id) // server to respond with 'homepage'
 // })
 
-
-
 /* express gets triggered when URL is /:id.... posts by all users listed
 his has to be further down as this address is more generic catch-all */
 
-/* get create todolist page */
+function userVerification (reqID, userID) {
+  if (reqID == userID) return true
+}
+
+/* get post create page */
 router.get('/:userid/create', function (req, res) {
-  res.render('post/createpost')
+  if (!userVerification(req.params.userid, req.user._id)) {
+    req.flash('error', 'Unauthorised')
+    res.redirect('/auth/login')
+  } else {
+    User.findById(req.user._id, function (err) {
+      if (err) {
+        req.flash('error', 'something may have gone wrong')
+        req.redirect('/')
+      }
+      res.render('post/createpost', {fields: null})
+    })
+  }
 })
 
 /* create todolist */
 router.post('/:userid/create', function (req, res) {
-  Post.create({
-    user: req.user._id,
-    title: req.body.title,
-    article: req.body.article,
-    tags: req.body.tags
-  },
-  function (err, newPost) {
-    if (err) {
-      req.flash('error', 'Post could not be created')
-      res.redirect('/' + req.user._id + '/create')
-    } else {
-      User.findById(req.user._id, (err, user) => {
-        if (err) return err
-        user.posts.push(newPost._id)
-        user.save()
-        res.redirect('/user/' + req.user._id)
+  if (!userVerification(req.params.userid, req.user._id)) {
+    req.flash('error', 'Unauthorised')
+    res.redirect('/auth/login')
+  } else {
+    if (req.body.title === '' || req.body.article === '') {
+      req.flash('error', 'Required fields must be filled')
+      res.render('post/createpost', {
+        fields: {
+          title: req.body.title,
+          article: req.body.article,
+          tags: req.body.tags
+        }
       })
+    } else {
+      Post.create({
+        user: req.user._id,
+        title: req.body.title,
+        article: req.body.article,
+        tags: req.body.tags
+      }, (err, newPost) => {
+        if (err) res.status(500).render({errMsg: err})
+        User.findById(req.user._id, (err, user) => {
+          if (err) res.status(500).render({errMsg: err})
+          user.posts.push(newPost._id)
+          user.save()
+          req.flash('success', 'Post created')
+          res.redirect('/user/' + req.user._id)
+        })
+      }
+    )
     }
-  })
+  }
 })
 
 router.get('/:userid/editprofile', function (req, res) {
-  User.findById(req.user._id, function (err, profile) {
-    if (err) return res.status(500).render({errorMsg: err})
-    console.log('profile contains...',profile);
-    res.render('auth/editprofile', {userdetails: profile})
-  })
+  if (!userVerification(req.params.userid, req.user._id)) {
+    req.flash('error', 'Unauthorised')
+    res.redirect('/auth/login')
+  } else {
+    User.findById(req.user._id, (err, profile) => {
+      if (err) res.status(500).render({errMsg: err})
+      res.render('auth/editprofile', {userdetails: profile})
+    })
+  }
 })
 
-/* update the post */
-router.put('/:userid/editprofile', function (req, res) {
-  console.log('req.body is ', req.body);
-  User.findByIdAndUpdate(req.user._id
-  , {
-    name: {
-      firstname: req.body['name.firstname'],
-      lastname: req.body['name.lastname']
-    },
-    website: req.params.website,
-    skillsintro: req.params.skillsintro,
-    role: req.params.role
-  }, {
-    new: true,
-    runValidators: true
-  }, (err, updatedPost) => {
-    if (err) return req.flash('error', 'Profile update unsuccesful')
-    req.flash('success', 'Profile updated')
-    res.redirect('/user/' + req.user.id + "/editprofile")
-  })
+/* update the post slightly buggy method */
+// router.put('/:userid/editprofile', function (req, res) {
+//   console.log('req.body is ', req.body)
+//   User.findByIdAndUpdate(req.user._id
+//   , {
+//     name: {
+//       firstname: req.body.firstname, // in the form, the name of that field is meant for referencing.
+//       lastname: req.body.lastname
+//     },
+//     website: req.body.website,
+//     skillsintro: req.body.skillsintro,
+//     role: req.body.role
+//   }, {
+//     runValidators: true
+//   }, (err, updatedPost) => {
+//     if (err) return req.flash('error', 'Profile update unsuccesful')
+//     req.flash('success', 'Profile updated')
+//     res.redirect('/user/' + req.user.id + '/editprofile')
+//   })
+// })
+
+router.put('/:userid/editprofile', (req, res) => {
+  if (!userVerification(req.params.userid, req.user._id)) {
+    req.flash('error', 'Unauthorised')
+    res.redirect('/auth/login')
+  } else {
+    User.findById(req.user._id, (err, updatedInfo) => {
+      if (err) {
+        req.flash('error', 'Profile update unsuccesful')
+        res.redirect('/user/' + req.user.id + '/editprofile')
+      } else {
+        updatedInfo.name.firstname = req.body.firstname // in the form, the name of that field is meant for referencing
+        updatedInfo.name.lastname = req.body.lastname
+        updatedInfo.website = req.body.website
+        updatedInfo.skillsintro = req.body.skillsintro
+        updatedInfo.role = req.body.role
+        updatedInfo.save(function (err) {
+          (err) ? req.flash('error', 'Profile update unsuccessful') : req.flash('success', 'Profile updated')
+          res.redirect('/user/' + req.user.id + '/editprofile')
+        })
+      }
+    })
+  }
 })
 
-
-
-
+router.get('/:userid/edit', (req, res) => {
+  if (!userVerification(req.params.userid, req.user._id)) {
+    req.flash('error', 'Unauthorised')
+    res.redirect('/auth/login')
+  } else {
+    User
+    .findById(req.user._id)
+    .populate('posts')
+    .exec((err, userArticles) => {
+      if (err) {
+        req.flash('error', 'Something has gone wrong')
+        res.redirect('/user/' + req.user.id)
+      } else {
+        res.render('post/postpage', {articles: userArticles})
+      }
+    })
+  }
+})
 
 router.get('/:userid/edit/:postid', function (req, res) {
-  Post.find({_id: req.params.postid}, function (err, currentPost) {
-    if (err) return res.status(500).render({errorMsg: err})
-    res.render('post/editpost', {article: currentPost})
-  })
+  if (!userVerification(req.params.userid, req.user._id)) {
+    req.flash('error', 'Unauthorised')
+    res.redirect('/auth/login')
+  } else {
+    Post.find({user: req.user._id, _id: req.params.postid}, function (err, currentPost) {
+      if (err) {
+        req.flash('err', 'error occurred')
+        res.redirect('/user/' + req.user.id)
+      } else {
+        res.render('post/editpost', {article: currentPost})
+      }
+    })
+  }
 })
 
 /* update the post */
 router.put('/:userid/edit/:postid', function (req, res) {
-  Post.findByIdAndUpdate(req.params.postid
+  Post.findOneAndUpdate({user: req.user._id, _id: req.params.postid}
   , {
     title: req.body.title,
     article: req.body.article,
@@ -95,32 +170,35 @@ router.put('/:userid/edit/:postid', function (req, res) {
     new: true,
     runValidators: true
   }, (err, updatedPost) => {
-    if (err) return res.status(500).render({errorMsg: err})
-    req.flash('success', 'Post updated')
+    (err) ? req.flash('error', 'Error updating post') : req.flash('success', 'Post updated')
     res.redirect('/user/' + req.user.id)
-  })
+  }
+  )
 })
 
-  /* returns user's post only */
-  router.get('/:userid', function (req, res) {
-    User
-    .findOne({_id: req.user.id})
+  /* returns specific user's post */
+router.get('/:userid', (req, res) => {
+  User
+    .findOne({_id: req.params.userid})
     .populate('posts')
     .exec(function (err, myarticles) {
-      console.log('my articles are...', myarticles)// prints out specific req user object
+      console.log('specific users articles are ', myarticles);
       if (err) return res.status(500).render({errMsg: err})
-      res.render('post/postpage', {articles: myarticles})
+      res.render('post/articleview', {articles: myarticles})
     })
-  })
-
-router.get('/', function (req, res) {
-  Post.find({}).populate('user').exec(function (err, posts) {
-    console.log('posts contain', posts);
-    if (err) return res.status(500).flash('error', 'error...')
-    res.render('post/homepage', {articles: posts})
-  } )
 })
 
+/* returns all posts */
+router.get('/', (req, res) => {
+  Post.find({}).populate('user').exec(function (err, posts) {
+    if (err) {
+      req.flash('error', 'error loading homepage...:(')
+      res.status(500)
+    } else {
+    res.render('post/articleview', {articles: posts})
+    }
+  })
+})
 
 /* proof that post creation and embedding works */
 // Post.create({
@@ -141,22 +219,25 @@ router.get('/', function (req, res) {
 //  newPost.save()
 // })
 
-
-router.delete('/:userid/delete/:postid', function (req, res) {
-  Post.findByIdAndRemove(req.params.postid, function (err, post) {
-    if (err) return res.status(500).render({ errorMsg: err })
-    User.findByIdAndUpdate(
-      req.user._id,
-      {'$pull': { posts: post._id }}, {
-        new: true,
-        runValidators: true
-      }, (err, remainingPosts) => {
-        if (err) return req.flash('error', 'Action unsuccesful')
-        req.flash('success', 'Post deleted')
-        res.redirect('/user/' + req.user.id)
-      }
-    )
-  })
+router.delete('/:userid/delete/:postid', (req, res) => {
+  if (!userVerification(req.params.userid, req.user._id)) {
+    req.flash('error', 'Unauthorised')
+    res.redirect('/auth/login')
+  } else {
+    Post.findByIdAndRemove(req.params.postid, function (err, post) {
+      if (err) return res.status(500).render({ errorMsg: err })
+      User.findByIdAndUpdate(
+        req.user._id,
+        {'$pull': { posts: post._id }}, {
+          new: true,
+          runValidators: true
+        }, (err, remainingPosts) => {
+          (err) ? req.flashreq.flash('error', 'Delete unsuccesful') : req.flash('success', 'Post deleted')
+          res.redirect('/user/' + req.user.id)
+        }
+      )
+    })
+  }
 })
 
 module.exports = router

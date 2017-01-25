@@ -31,7 +31,7 @@
        <hr>
       <% } %>
 
-    <% } else if (currentUser.id != articles.id) { %>
+    <% } else { %>
 
     <h1>Latest articles from <%= articles.name.firstname %></h1>
 
@@ -70,6 +70,13 @@
           <p style="font-style:italic">"<%=articles.skillsintro%>"</p>
           <p>Contributed <%=articles.posts.length%> posts to date</p>
           <p>Made <%=articles.comments.length%> comments to date</p>
+        </div>
+      <% } else if (currentUser.id == articles.id) { %>
+        <div class="well">
+          <p>filler</p>
+        </div>
+        <div class="well">
+          <p>filler</p>
         </div>
       <% } %>
   </div>
