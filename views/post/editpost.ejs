@@ -8,13 +8,15 @@
     <p>Made <%=currentUser.comments.length%> comments to date</p>
   </div>
   <div class="col-sm-8 text-left">
-    <h1>Curate your pensieve...</h1>
+    <h1>Curate your pensieve</h1>
+
     <% article.forEach(function(item) { %>
-    <form method="post" class="form-horizontal" action=<%="/user/"+ item.user + "/edit/" + item._id + "?_method=PUT"%>>
+      
+    <form method="post" class="form-horizontal" action=<%="/user/"+ article._id + "/edit/" + item._id + "?_method=PUT"%>>
 
       <div class="form-group">
         Title:
-        <input type="text" class="form-control" name="title"  aria-describedby="basic-addon2" value=<%= item.title %>>
+        <input type="text" class="form-control" name="title"  aria-describedby="basic-addon2" value="<%= item.title %>">
       </div>
 
       <div class="form-group">
@@ -24,7 +26,7 @@
 
       <div class="form-group">
         Tags:
-        <input type="text" class="form-control" name="tags" placeholder="Leave a space between each tag" aria-describedby="basic-addon2" value=<%= item.tags %>>
+        <input type="text" class="form-control" name="tags" placeholder="Leave a space between each tag" aria-describedby="basic-addon2" value="<%= item.tags %>">
       </div>
       <% }) %>
       <button type="submit" class="btn btn-default">Update Post</button>

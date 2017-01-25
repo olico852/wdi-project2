@@ -12,9 +12,9 @@
       <ul class="nav navbar-nav">
         <li class="active"><a href="/user">Home</a></li>
         <li><a href=<%="/user/"+ currentUser._id +"/create"%>>Pen Your New Post</a></li>
-        <li><a href=<%="/user/"+ currentUser._id %>>Your Posts</a></li>
+        <li><a href=<%="/user/"+ currentUser._id + "/edit"%>>Your Posts</a></li>
         <li><a href=<%="/user/"+ currentUser._id +"/comments"%>>Your Comments</a></li>
-        <li><a href="#">Edit Profile</a></li>
+        <li><a href=<%="/user/"+ currentUser._id +"/editprofile"%>>Edit Profile</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/auth/logout"><span class="glyphicon glyphicon-log-in"></span>Logout</a></li>

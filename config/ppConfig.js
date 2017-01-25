@@ -9,7 +9,7 @@ passport.serializeUser(function (user, done) {
 // run each time user goes to a new page. ensures that it's the same user so that relevant server data is accessed
 passport.deserializeUser(function(id,done) {
   User.findById(id, function(err,user) {
-    console.log(user);
+    // console.log(user);
     done(err, user)
   })
 })
@@ -22,7 +22,7 @@ passport.use(new LocalStrategy ({
     if (err) return done(err)
     if (!user) return done(null, false)
     if (!user.validPassword(password)) return done(null,false)
-    console.log(user);
+    // console.log(user);
     return done(null, user)
   })
 }))

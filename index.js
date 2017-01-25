@@ -55,7 +55,7 @@ app.use('/auth', require('./controllers/user_controllers'))
 app.use(isLoggedIn) // anything after this will need to be logged in.
 
 app.use('/user', require('./controllers/post_controllers'))
-// app.use('/:userid/comments', require('./controllers/comment_controllers')) // this gives direct access to comments by commenter
+app.use('/comments', require('./controllers/comment_controllers')) // this gives direct access to comments by commenter
 
 
 

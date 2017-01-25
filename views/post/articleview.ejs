@@ -1,0 +1,76 @@
+<div class="row content">
+  <div class="col-sm-2 sidenav">
+    <div class="well">
+    <h1></h1>
+    <p>Hello <%=currentUser.name.firstname%></p>
+    <p>You're a <%=currentUser.role%></p>
+    <p>Your work is found at: <a href="http://<%-currentUser.website%>"><%=currentUser.website%></a></p>
+    <p style="font-style:italic">"<%=currentUser.skillsintro%>"</p>
+    <p>Contributed <%=currentUser.posts.length%> posts to date</p>
+    <p>Made <%=currentUser.comments.length%> comments to date</p>
+    </div>
+  </div>
+
+  <div class="col-sm-8 text-left">
+
+    <% if (Array.isArray(articles)) { %>
+      <h1>Latest articles from the stream...</h1>
+      <% for (var i = (articles.length - 1); i > -1; i--) { %>
+       <hr>
+       <h2><%= articles[i].title %></h2>
+       <h5><a href="/user/<%=articles[i].user._id%>"> By <%= articles[i].user.name.firstname %> <%= articles[i].user.name.lastname %></a></h5>
+       <h5><span class="glyphicon glyphicon-time"></span> Posted on <%= articles[i].created_at %></h5>
+       <% let createdTime = new Date(articles[i].created_at) %>
+       <% let updatedTime = new Date(articles[i].updated_at) %>
+        <% if (createdTime.toUTCString() === updatedTime.toUTCString()) { %>
+          <%  } else { %>
+          <h5 style="font-style:italic"><span class="glyphicon glyphicon-time"></span> Updated on <%= articles[i].updated_at %></h5>
+        <% } %>
+       <h5><span class="label label-primary"><%= articles[i].tags %></span> <span class="label label-primary">Ipsum</span></h5><br>
+       <p><%= articles[i].article %></p>
+       <hr>
+      <% } %>
+
+    <% } else if (currentUser.id != articles.id) { %>
+
+    <h1>Latest articles from <%= articles.name.firstname %></h1>
+
+    <% for (var i = (articles.posts.length - 1); i > -1; i--) { %>
+     <hr>
+     <h2><%= articles.posts[i].title %></h2>
+     <h5><a href="#"> By <%= articles.name.firstname %> <%= articles.name.lastname %></a></h5>
+     <h5><span class="glyphicon glyphicon-time"></span> Posted on <%= articles.posts[i].created_at %></h5>
+     <% let createdTime = new Date(articles.posts[i].created_at) %>
+     <% let updatedTime = new Date(articles.posts[i].updated_at) %>
+      <% if (createdTime.toUTCString() === updatedTime.toUTCString()) { %>
+        <%  } else { %>
+        <h5 style="font-style:italic"><span class="glyphicon glyphicon-time"></span> Updated on <%= articles.posts[i].updated_at %></h5>
+      <% } %>
+     <h5><span class="label label-primary"><%= articles.posts[i].tags %></span> <span class="label label-primary">Ipsum</span></h5><br>
+     <p><%= articles.posts[i].article %></p>
+     <hr>
+
+     <% } %>
+  <% } %>
+     </div>
+
+  <div class="col-sm-2 sidenav">
+    <% if (Array.isArray(articles)) { %>
+    <div class="well">
+      <p>filler</p>
+    </div>
+    <div class="well">
+      <p>filler</p>
+    </div>
+      <% } else if (currentUser.id != articles.id) { %>
+        <div class="well">
+          <p>You're viewing <%=articles.name.firstname%> <%=articles.name.lastname%>'s posts</p>
+          <p>User works as a <%=articles.role%></p>
+          <p>View their portfolio at <a href="http://<%articles.website%>"><%=articles.website%></a></p>
+          <p style="font-style:italic">"<%=articles.skillsintro%>"</p>
+          <p>Contributed <%=articles.posts.length%> posts to date</p>
+          <p>Made <%=articles.comments.length%> comments to date</p>
+        </div>
+      <% } %>
+  </div>
+</div>
