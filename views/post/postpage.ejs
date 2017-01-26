@@ -1,15 +1,9 @@
 <div class="row content">
   <div class="col-sm-2 sidenav">
-    <p>Hello <%=currentUser.name.firstname%></p>
-    <p>You're a <%=currentUser.role%></p>
-    <p>Your work is found at: <%=currentUser.website%></p>
-    <p><%=currentUser.skillsintro%></p>
-    <p>Contributed <%=currentUser.posts.length%> posts to date</p>
-    <p>Made <%=currentUser.comments.length%> comments to date</p>
-  </div>
+<% include ../auth/partials/usernav %>
+</div>
   <div class="col-sm-8 text-left">
-    <h1>Your articles...</h1>
-
+    <h1>Edit your articles...</h1>
 
     <% for (var i = articles.posts.length-1; i > -1; i--) { %>
 

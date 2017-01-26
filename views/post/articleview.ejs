@@ -1,14 +1,6 @@
 <div class="row content">
   <div class="col-sm-2 sidenav">
-    <div class="well">
-    <h1></h1>
-    <p>Hello <%=currentUser.name.firstname%></p>
-    <p>You're a <%=currentUser.role%></p>
-    <p>Your work is found at: <a href="http://<%-currentUser.website%>"><%=currentUser.website%></a></p>
-    <p style="font-style:italic">"<%=currentUser.skillsintro%>"</p>
-    <p>Contributed <%=currentUser.posts.length%> posts to date</p>
-    <p>Made <%=currentUser.comments.length%> comments to date</p>
-    </div>
+    <% include ../auth/partials/usernav %>
   </div>
 
   <div class="col-sm-8 text-left">
@@ -17,7 +9,7 @@
       <h1>Latest articles from the stream...</h1>
       <% for (var i = (articles.length - 1); i > -1; i--) { %>
        <hr>
-       <h2><%= articles[i].title %></h2>
+       <h2><a href="/post/<%=articles[i]._id%>"><%= articles[i].title %></a></h2>
        <h5><a href="/user/<%=articles[i].user._id%>"> By <%= articles[i].user.name.firstname %> <%= articles[i].user.name.lastname %></a></h5>
        <h5><span class="glyphicon glyphicon-time"></span> Posted on <%= articles[i].created_at %></h5>
        <% let createdTime = new Date(articles[i].created_at) %>
@@ -37,8 +29,8 @@
 
     <% for (var i = (articles.posts.length - 1); i > -1; i--) { %>
      <hr>
-     <h2><%= articles.posts[i].title %></h2>
-     <h5><a href="#"> By <%= articles.name.firstname %> <%= articles.name.lastname %></a></h5>
+     <h2><a href="/post/<%=articles.posts[i]._id%>"><%= articles.posts[i].title %></a></h2>
+     <h5>By <%= articles.name.firstname %> <%= articles.name.lastname %></h5>
      <h5><span class="glyphicon glyphicon-time"></span> Posted on <%= articles.posts[i].created_at %></h5>
      <% let createdTime = new Date(articles.posts[i].created_at) %>
      <% let updatedTime = new Date(articles.posts[i].updated_at) %>
@@ -68,8 +60,8 @@
           <p>User works as a <%=articles.role%></p>
           <p>View their portfolio at <a href="http://<%articles.website%>"><%=articles.website%></a></p>
           <p style="font-style:italic">"<%=articles.skillsintro%>"</p>
-          <p>Contributed <%=articles.posts.length%> posts to date</p>
-          <p>Made <%=articles.comments.length%> comments to date</p>
+          <p>Has <a style="text-decoration: underline" href="/post/<%=articles.id%>"><%=articles.posts.length%> posts </a> to date</p>
+          <p>Made <a style="text-decoration: underline" href="/user/<%=articles.id%>/comments"><%=articles.comments.length%> comments </a> to date</p>
         </div>
       <% } else if (currentUser.id == articles.id) { %>
         <div class="well">

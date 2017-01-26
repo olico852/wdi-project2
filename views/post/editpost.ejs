@@ -1,17 +1,12 @@
 <div class="row content">
   <div class="col-sm-2 sidenav">
-    <p>Hello <%=currentUser.name.firstname%></p>
-    <p>You're a <%=currentUser.role%></p>
-    <p>Your work is found at: <%=currentUser.website%></p>
-    <p><%=currentUser.skillsintro%></p>
-    <p>Contributed <%=currentUser.posts.length%> posts to date</p>
-    <p>Made <%=currentUser.comments.length%> comments to date</p>
+  <% include ../auth/partials/usernav %>
   </div>
   <div class="col-sm-8 text-left">
     <h1>Curate your pensieve</h1>
 
     <% article.forEach(function(item) { %>
-      
+
     <form method="post" class="form-horizontal" action=<%="/user/"+ article._id + "/edit/" + item._id + "?_method=PUT"%>>
 
       <div class="form-group">
@@ -21,7 +16,7 @@
 
       <div class="form-group">
         Post body:
-        <textarea type="text" rows='12' class="form-control" name="article" aria-describedby="basic-addon2"><%= item.article %></textarea>
+        <textarea type="text" rows='12' class="form-control" name="article" aria-describedby="basic-addon2" required><%= item.article %></textarea>
       </div>
 
       <div class="form-group">

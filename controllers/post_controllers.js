@@ -52,9 +52,9 @@ router.post('/:userid/create', function (req, res) {
         title: req.body.title,
         article: req.body.article,
         tags: req.body.tags
-      }, (err, newPost) => {
+      }, function (err, newPost) {
         if (err) res.status(500).render({errMsg: err})
-        User.findById(req.user._id, (err, user) => {
+        User.findById(req.user._id, function (err, user) {
           if (err) res.status(500).render({errMsg: err})
           user.posts.push(newPost._id)
           user.save()
@@ -67,38 +67,17 @@ router.post('/:userid/create', function (req, res) {
   }
 })
 
-router.get('/:userid/editprofile', function (req, res) {
+router.get('/:userid/editprofile', (req, res) => {
   if (!userVerification(req.params.userid, req.user._id)) {
     req.flash('error', 'Unauthorised')
     res.redirect('/auth/login')
   } else {
-    User.findById(req.user._id, (err, profile) => {
+    User.findById(req.user._id, function (err, profile) {
       if (err) res.status(500).render({errMsg: err})
       res.render('auth/editprofile', {userdetails: profile})
     })
   }
 })
-
-/* update the post slightly buggy method */
-// router.put('/:userid/editprofile', function (req, res) {
-//   console.log('req.body is ', req.body)
-//   User.findByIdAndUpdate(req.user._id
-//   , {
-//     name: {
-//       firstname: req.body.firstname, // in the form, the name of that field is meant for referencing.
-//       lastname: req.body.lastname
-//     },
-//     website: req.body.website,
-//     skillsintro: req.body.skillsintro,
-//     role: req.body.role
-//   }, {
-//     runValidators: true
-//   }, (err, updatedPost) => {
-//     if (err) return req.flash('error', 'Profile update unsuccesful')
-//     req.flash('success', 'Profile updated')
-//     res.redirect('/user/' + req.user.id + '/editprofile')
-//   })
-// })
 
 router.put('/:userid/editprofile', (req, res) => {
   if (!userVerification(req.params.userid, req.user._id)) {
@@ -124,7 +103,7 @@ router.put('/:userid/editprofile', (req, res) => {
   }
 })
 
-router.get('/:userid/edit', (req, res) => {
+router.get('/:userid/edit', function (req, res) {
   if (!userVerification(req.params.userid, req.user._id)) {
     req.flash('error', 'Unauthorised')
     res.redirect('/auth/login')
@@ -132,7 +111,7 @@ router.get('/:userid/edit', (req, res) => {
     User
     .findById(req.user._id)
     .populate('posts')
-    .exec((err, userArticles) => {
+    .exec(function (err, userArticles) {
       if (err) {
         req.flash('error', 'Something has gone wrong')
         res.redirect('/user/' + req.user.id)
@@ -143,7 +122,7 @@ router.get('/:userid/edit', (req, res) => {
   }
 })
 
-router.get('/:userid/edit/:postid', function (req, res) {
+router.get('/:userid/edit/:postid', (req, res) => {
   if (!userVerification(req.params.userid, req.user._id)) {
     req.flash('error', 'Unauthorised')
     res.redirect('/auth/login')
@@ -160,7 +139,7 @@ router.get('/:userid/edit/:postid', function (req, res) {
 })
 
 /* update the post */
-router.put('/:userid/edit/:postid', function (req, res) {
+router.put('/:userid/edit/:postid', (req, res) => {
   Post.findOneAndUpdate({user: req.user._id, _id: req.params.postid}
   , {
     title: req.body.title,
@@ -169,55 +148,49 @@ router.put('/:userid/edit/:postid', function (req, res) {
   }, {
     new: true,
     runValidators: true
-  }, (err, updatedPost) => {
+  }, function (err, updatedPost) {
     (err) ? req.flash('error', 'Error updating post') : req.flash('success', 'Post updated')
     res.redirect('/user/' + req.user.id)
   }
   )
 })
 
+router.get('/:userid/comments', function (req, res) {
+  User
+    .findOne({_id: req.params.userid})
+    .populate(
+      {path: 'comments',
+       populate: {path:'postId'}
+     })
+    .exec(function (err, myComments) {
+      if (err) return res.status(500).render({errMsg: err})
+      console.log('returned object ', myComments)
+      res.render('post/commentview', {comments: myComments})
+    })
+})
+
   /* returns specific user's post */
-router.get('/:userid', (req, res) => {
+router.get('/:userid', function (req, res) {
   User
     .findOne({_id: req.params.userid})
     .populate('posts')
     .exec(function (err, myarticles) {
-      console.log('specific users articles are ', myarticles);
       if (err) return res.status(500).render({errMsg: err})
       res.render('post/articleview', {articles: myarticles})
     })
 })
 
 /* returns all posts */
-router.get('/', (req, res) => {
+router.get('/', function (req, res) {
   Post.find({}).populate('user').exec(function (err, posts) {
     if (err) {
       req.flash('error', 'error loading homepage...:(')
       res.status(500)
     } else {
-    res.render('post/articleview', {articles: posts})
+      res.render('post/articleview', {articles: posts})
     }
   })
 })
-
-/* proof that post creation and embedding works */
-// Post.create({
-//   user: '5885d5908b1346beb802e676',
-//   title: 'daily thoughts',
-//   article: 'daily ramblings. not so cool after all womannnn',
-//   tags: 'thoughts ramblings test',
-//   comments: [
-//   {
-//     author: '5885d5908b1346beb802e676',
-//     text: 'you need a bit more depth in your post',
-//   },{
-//     name: '5885d5908b1346beb802e676',
-//     text: 'pretentious wanker!'
-//   }]
-// }, function (err, newPost) {
-//  newPost.comments.push({ author: '5885d5908b1346beb802e676', text: 'somethingsomething' })
-//  newPost.save()
-// })
 
 router.delete('/:userid/delete/:postid', (req, res) => {
   if (!userVerification(req.params.userid, req.user._id)) {
@@ -231,7 +204,7 @@ router.delete('/:userid/delete/:postid', (req, res) => {
         {'$pull': { posts: post._id }}, {
           new: true,
           runValidators: true
-        }, (err, remainingPosts) => {
+        }, function (err, remainingPosts) {
           (err) ? req.flashreq.flash('error', 'Delete unsuccesful') : req.flash('success', 'Post deleted')
           res.redirect('/user/' + req.user.id)
         }

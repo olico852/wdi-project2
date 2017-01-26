@@ -1,243 +1,99 @@
+const Reply = require('../models/comment_model')
 const Post = require('../models/post_model')
 const User = require('../models/user_model')
 const express = require('express')
 const router = express.Router()
 const flash = require('connect-flash')
 
-// router.get('/', function (req, res) { // express gets triggered when someone types in '/' which is a request
-//   res.redirect('/' + req.user._id) // server to respond with 'homepage'
-// })
-
-/* express gets triggered when URL is /:id.... posts by all users listed
-his has to be further down as this address is more generic catch-all */
-
-function userVerification (reqID, userID) {
-  if (reqID == userID) return true
-}
-
-/* get post create page */
-router.get('/:userid/create', function (req, res) {
-  if (!userVerification(req.params.userid, req.user._id)) {
-    req.flash('error', 'Unauthorised')
-    res.redirect('/auth/login')
-  } else {
-    User.findById(req.user._id, function (err) {
-      if (err) {
-        req.flash('error', 'something may have gone wrong')
-        req.redirect('/')
-      }
-      res.render('post/createpost', {fields: null})
-    })
-  }
-})
-
-/* create todolist */
-router.post('/:userid/create', function (req, res) {
-  if (!userVerification(req.params.userid, req.user._id)) {
-    req.flash('error', 'Unauthorised')
-    res.redirect('/auth/login')
-  } else {
-    if (req.body.title === '' || req.body.article === '') {
-      req.flash('error', 'Required fields must be filled')
-      res.render('post/createpost', {
-        fields: {
-          title: req.body.title,
-          article: req.body.article,
-          tags: req.body.tags
-        }
-      })
-    } else {
-      Post.create({
-        user: req.user._id,
-        title: req.body.title,
-        article: req.body.article,
-        tags: req.body.tags
-      }, (err, newPost) => {
-        if (err) res.status(500).render({errMsg: err})
-        User.findById(req.user._id, (err, user) => {
-          if (err) res.status(500).render({errMsg: err})
-          user.posts.push(newPost._id)
-          user.save()
-          req.flash('success', 'Post created')
-          res.redirect('/user/' + req.user._id)
-        })
-      }
-    )
-    }
-  }
-})
-
-router.get('/:userid/editprofile', function (req, res) {
-  if (!userVerification(req.params.userid, req.user._id)) {
-    req.flash('error', 'Unauthorised')
-    res.redirect('/auth/login')
-  } else {
-    User.findById(req.user._id, (err, profile) => {
-      if (err) res.status(500).render({errMsg: err})
-      res.render('auth/editprofile', {userdetails: profile})
-    })
-  }
-})
-
-/* update the post slightly buggy method */
-// router.put('/:userid/editprofile', function (req, res) {
-//   console.log('req.body is ', req.body)
-//   User.findByIdAndUpdate(req.user._id
-//   , {
-//     name: {
-//       firstname: req.body.firstname, // in the form, the name of that field is meant for referencing.
-//       lastname: req.body.lastname
-//     },
-//     website: req.body.website,
-//     skillsintro: req.body.skillsintro,
-//     role: req.body.role
-//   }, {
-//     runValidators: true
-//   }, (err, updatedPost) => {
-//     if (err) return req.flash('error', 'Profile update unsuccesful')
-//     req.flash('success', 'Profile updated')
-//     res.redirect('/user/' + req.user.id + '/editprofile')
-//   })
-// })
-
-router.put('/:userid/editprofile', (req, res) => {
-  if (!userVerification(req.params.userid, req.user._id)) {
-    req.flash('error', 'Unauthorised')
-    res.redirect('/auth/login')
-  } else {
-    User.findById(req.user._id, (err, updatedInfo) => {
-      if (err) {
-        req.flash('error', 'Profile update unsuccesful')
-        res.redirect('/user/' + req.user.id + '/editprofile')
-      } else {
-        updatedInfo.name.firstname = req.body.firstname // in the form, the name of that field is meant for referencing
-        updatedInfo.name.lastname = req.body.lastname
-        updatedInfo.website = req.body.website
-        updatedInfo.skillsintro = req.body.skillsintro
-        updatedInfo.role = req.body.role
-        updatedInfo.save(function (err) {
-          (err) ? req.flash('error', 'Profile update unsuccessful') : req.flash('success', 'Profile updated')
-          res.redirect('/user/' + req.user.id + '/editprofile')
-        })
-      }
-    })
-  }
-})
-
-router.get('/:userid/edit', (req, res) => {
-  if (!userVerification(req.params.userid, req.user._id)) {
-    req.flash('error', 'Unauthorised')
-    res.redirect('/auth/login')
-  } else {
-    User
-    .findById(req.user._id)
-    .populate('posts')
-    .exec((err, userArticles) => {
-      if (err) {
-        req.flash('error', 'Something has gone wrong')
-        res.redirect('/user/' + req.user.id)
-      } else {
-        res.render('post/postpage', {articles: userArticles})
-      }
-    })
-  }
-})
-
-router.get('/:userid/edit/:postid', function (req, res) {
-  if (!userVerification(req.params.userid, req.user._id)) {
-    req.flash('error', 'Unauthorised')
-    res.redirect('/auth/login')
-  } else {
-    Post.find({user: req.user._id, _id: req.params.postid}, function (err, currentPost) {
-      if (err) {
-        req.flash('err', 'error occurred')
-        res.redirect('/user/' + req.user.id)
-      } else {
-        res.render('post/editpost', {article: currentPost})
-      }
-    })
-  }
-})
-
-/* update the post */
-router.put('/:userid/edit/:postid', function (req, res) {
-  Post.findOneAndUpdate({user: req.user._id, _id: req.params.postid}
-  , {
-    title: req.body.title,
-    article: req.body.article,
-    tags: req.body.tags
-  }, {
-    new: true,
-    runValidators: true
-  }, (err, updatedPost) => {
-    (err) ? req.flash('error', 'Error updating post') : req.flash('success', 'Post updated')
-    res.redirect('/user/' + req.user.id)
-  }
-  )
-})
-
-  /* returns specific user's post */
-router.get('/:userid', (req, res) => {
-  User
-    .findOne({_id: req.params.userid})
-    .populate('posts')
-    .exec(function (err, myarticles) {
-      console.log('specific users articles are ', myarticles);
-      if (err) return res.status(500).render({errMsg: err})
-      res.render('post/articleview', {articles: myarticles})
-    })
-})
-
-/* returns all posts */
-router.get('/', (req, res) => {
-  Post.find({}).populate('user').exec(function (err, posts) {
+router.get('/:postid', function (req, res) {
+  Post
+  .findById(req.params.postid)
+  .populate('user')
+  .populate({
+    path: 'comments',
+    populate: { path: 'authorId' }
+  })
+  .exec(function (err, solopost) {
     if (err) {
-      req.flash('error', 'error loading homepage...:(')
-      res.status(500)
+      req.flash('error', 'error loading homepage...')
+      res.status(500).render({errMsg: err})
     } else {
-    res.render('post/articleview', {articles: posts})
+      res.render('comment/soloPostAndComment', {post: solopost})
     }
   })
 })
 
-/* proof that post creation and embedding works */
-// Post.create({
-//   user: '5885d5908b1346beb802e676',
-//   title: 'daily thoughts',
-//   article: 'daily ramblings. not so cool after all womannnn',
-//   tags: 'thoughts ramblings test',
-//   comments: [
-//   {
-//     author: '5885d5908b1346beb802e676',
-//     text: 'you need a bit more depth in your post',
-//   },{
-//     name: '5885d5908b1346beb802e676',
-//     text: 'pretentious wanker!'
-//   }]
-// }, function (err, newPost) {
-//  newPost.comments.push({ author: '5885d5908b1346beb802e676', text: 'somethingsomething' })
-//  newPost.save()
-// })
-
-router.delete('/:userid/delete/:postid', (req, res) => {
-  if (!userVerification(req.params.userid, req.user._id)) {
-    req.flash('error', 'Unauthorised')
-    res.redirect('/auth/login')
+/* post comment */
+router.post('/:postid/create', function (req, res) {
+  if (req.body.text === '') {
+    req.flash('error', 'Comment field must not be empty')
+    res.redirect('')  // solo post view
   } else {
-    Post.findByIdAndRemove(req.params.postid, function (err, post) {
-      if (err) return res.status(500).render({ errorMsg: err })
-      User.findByIdAndUpdate(
-        req.user._id,
-        {'$pull': { posts: post._id }}, {
-          new: true,
-          runValidators: true
-        }, (err, remainingPosts) => {
-          (err) ? req.flashreq.flash('error', 'Delete unsuccesful') : req.flash('success', 'Post deleted')
-          res.redirect('/user/' + req.user.id)
+    Reply.create({
+      authorId: req.user._id,
+      postId: req.params.postid,
+      text: req.body.text
+    }, function (err, newComment) {
+      if (err) {
+        req.flash('error', 'Comment could not be created')
+        res.redirect('/post/' + req.params.postid)
+      } else {
+        Post.findByIdAndUpdate(req.params.postid, {
+          '$push': { comments: newComment._id }
+        }, function (err) {
+          if (err) res.status(500).render({errMsg: err})
+        })
+        User.findByIdAndUpdate(req.user._id, {
+          '$push': { comments: newComment._id }
+        }, function (err, user) {
+          (err) ? req.flash('error', 'Commment not posted') : req.flash('success', 'Commment posted')
+          res.redirect('/post/' + req.params.postid)
         }
-      )
+        )
+      }
     })
   }
+})
+
+/* do i need this if all i need is the ability to update?  */
+router.put('/:postid/:commentid/edit', (req, res) => {
+  Reply.findById(req.params.commentid, req.body, function (err, comment) {
+    if (err) {
+      req.flash('error', 'unsuccessful update...')
+      res.redirect('/post/' + req.params.postid)
+    } else {
+      comment.text = req.body.text
+      comment.save(function (err) {
+        (err) ? req.flash('error', 'Comment update unsuccessful') : req.flash('success', 'Comment updated')
+      })
+      res.redirect('/post/' + req.params.postid) // replace with solopostview
+    }
+  })
+})
+
+router.delete('/:postid/delete/:commentid', (req, res) => {
+  Reply.findByIdAndRemove(req.params.commentid, function (err, post) {
+    if (err) return res.status(500).render({ errorMsg: err })
+    User.findByIdAndUpdate(
+      req.user._id,
+      { '$pull': { comments: post._id } }, {
+        new: true,
+        runValidators: true
+      }, function (err, remainingPosts) {
+        (err) ? req.flashreq.flash('error', 'Delete unsuccesful') : req.flash('success', 'Post deleted')
+      }
+    )
+    Post.findByIdAndUpdate(
+      req.params.postid,
+      { '$pull': { comments: post._id } }, {
+        new: true,
+        runValidators: true
+      }, function (err, remainingPosts) {
+        (err) ? req.flash('error', 'Delete unsuccesful') : req.flash('success', 'Post deleted')
+        res.redirect('/post/' + req.params.postid)
+      }
+    )
+  })
 })
 
 module.exports = router

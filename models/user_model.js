@@ -39,7 +39,7 @@ var UserSchema = new mongoose.Schema({
     minlength: [5, 'One word to describe your profession']
   },
   posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}],
-  comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}]
+  comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Reply'}]
 })
 
 UserSchema.pre('save', function (next) {

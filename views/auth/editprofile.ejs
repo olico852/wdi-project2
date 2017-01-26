@@ -10,25 +10,19 @@
       <div class="form-group">
         <label class="control-label col-sm-2">*First Name:</label>
         <div class="col-sm-10">
-          <input type="text" name="firstname" class="form-control" id="firstname" value=<%= currentUser.name.firstname %>>
+          <input type="text" name="firstname" class="form-control" id="firstname" value="<%= currentUser.name.firstname%>" required>
         </div>
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2">*Last Name:</label>
         <div class="col-sm-10">
-          <input type="text" name="lastname" class="form-control" id="lastname" value=<%= currentUser.name.lastname %>>
+          <input type="text" name="lastname" class="form-control" id="lastname" value="<%= currentUser.name.lastname %>" required>
         </div>
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2" for="email">*Email:</label>
         <div class="col-sm-10">
           <input type="email" name="email" class="form-control" readonly id="email" value=<%= currentUser.email %>>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2" for="pwd">*Password:</label>
-        <div class="col-sm-10">
-          <input type="password" name="password" class="form-control" id="pwd" value=<%= currentUser.email %>>
         </div>
       </div>
       <div class="form-group">
@@ -40,7 +34,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2">*Role:</label>
         <div class="col-sm-10">
-          <input type="text" name="role" class="form-control" id="role" value=<%= currentUser.role %>>
+          <input type="text" name="role" class="form-control" id="role" value=<%= currentUser.role %> required>
         </div>
       </div>
       <div class="form-group">

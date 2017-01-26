@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Comment = require('./comment_model')
+const Reply = require('./comment_model')
 
 const PostSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -14,7 +14,7 @@ const PostSchema = new mongoose.Schema({
   tags: [{
     type: String
   }],
-  comments: [Comment.schema]
+  comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Reply'}]
 }, { timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'} })
 
 const Post = mongoose.model('Post', PostSchema)
