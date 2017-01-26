@@ -4,15 +4,14 @@
   "description": "ga wdi 7 project 2 full stack app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
-  "keywords": [
-    "chat",
-    "app",
-    "skills"
-  ],
   "author": "Olivia Chung",
   "license": "ISC",
+  "engine": {
+    "node": "^7.2.0"
+  },
   "dependencies": {
     "bcrypt": "^1.0.2",
     "body-parser": "^1.16.0",
