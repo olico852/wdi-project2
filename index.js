@@ -16,7 +16,7 @@ const path = require('path') // --????
 const app = express()
 const router = express.Router()
 
-mongoose.connect('mongodb://localhost/project2') // the database folder
+mongoose.connect(process.env.MONGODB_URI ||'mongodb://localhost/project2') // the database folder
 mongoose.Promise = global.Promise // promise are callbacks which can utiilse .get, .then method for neater, more elegant and more maintanable code.
 
 // app.set / .use here are executed in order so order matters!!!
