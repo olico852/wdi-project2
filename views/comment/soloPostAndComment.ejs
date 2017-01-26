@@ -8,7 +8,7 @@
        <h2><%= post.title %></h2>
        <h5><a href="/user/<%=post.user._id%>"> By <%=post.user.name.firstname %> <%= post.user.name.lastname %></a></h5>
        <h5><span class="glyphicon glyphicon-time"></span> Posted on <%= post.created_at %></h5>
-       <h5><span class="label label-primary"><%= post.tags %></span> <span class="label label-primary">Ipsum</span></h5><br>
+       <h5><span class="label label-primary"><%= post.tags %></span></h5><br>
        <p><%= post.article %></p>
        <hr>
 

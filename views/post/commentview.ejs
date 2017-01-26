@@ -35,12 +35,17 @@
           <p>Made <a style="text-decoration: underline" href="/users/<%=comments._id%>/comments"><%=comments.comments.length%> comments </a>to date</p>
         </div>
       <% } else if (currentUser.id == comments._id) { %>
+        What's trending...
         <div class="well">
-          <p>filler</p>
+          <a href="http://www.bbc.com/news/world-us-canada-38764079"><small>Trump seeks Mexican import tax to pay for border wall</small></a>
         </div>
         <div class="well">
-          <p>filler</p>
+          <a href="http://www.bbc.com/news/world-38760792"><small>Apocalypse is 30 seconds closer, say Doomsday Clock scientists</small></a>
         </div>
+        <div class="well">
+          <a href="https://www.theguardian.com/science/2017/jan/26/first-human-pig-chimera-created-in-milestone-study"><small>First human-pig 'chimera' created in milestone study</small></a>
+        </div>
+
       <% } %>
   </div>
 </div>

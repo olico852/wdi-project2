@@ -19,6 +19,11 @@
   margin-left: 5px;
 }
 
+#hero {
+  height: 50px;
+  width: 50px;
+  display: inline-block;
+}
 
 /* Set black background color, white text and some padding */
 footer {

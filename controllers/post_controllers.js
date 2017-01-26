@@ -159,9 +159,9 @@ router.get('/:userid/comments', function (req, res) {
   User
     .findOne({_id: req.params.userid})
     .populate(
-      {path: 'comments',
-       populate: {path:'postId'}
-     })
+    { path: 'comments',
+      populate: { path: 'postId' }
+    })
     .exec(function (err, myComments) {
       if (err) return res.status(500).render({errMsg: err})
       console.log('returned object ', myComments)

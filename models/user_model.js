@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
 const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/
 
 var UserSchema = new mongoose.Schema({
