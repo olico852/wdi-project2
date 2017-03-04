@@ -17,6 +17,8 @@ const PostSchema = new mongoose.Schema({
   comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Reply'}]
 }, { timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'} })
 
+PostSchema.index({'$**': 'text'})
+
 const Post = mongoose.model('Post', PostSchema)
 
 module.exports = Post

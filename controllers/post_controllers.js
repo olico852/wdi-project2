@@ -15,6 +15,23 @@ function userVerification (reqID, userID) {
   if (reqID == userID) return true
 }
 
+/* search through post title, article text and tags with keywords */
+router.get('/post/search', (req, res) => {
+  Post.find({'$text': { '$search': req.query.words } }, { score: { $meta: 'textScore' } })
+  .sort({ score: { $meta: 'textScore' } })
+  .populate('user')
+  .exec(function (err, results) {
+    console.log('results contain ', results)
+    if (err) {
+      req.flash('error', 'error loading homepage...')
+      res.redirect('back')
+    } else {
+      console.log(req.query);
+      res.render('post/searchresult', {articles: results, searchQuery: req.query})
+    }
+  })
+})
+
 /* get post create page */
 router.get('/:userid/create', function (req, res) {
   if (!userVerification(req.params.userid, req.user._id)) {
@@ -31,7 +48,7 @@ router.get('/:userid/create', function (req, res) {
   }
 })
 
-/* create todolist */
+/* create new post entry */
 router.post('/:userid/create', function (req, res) {
   if (!userVerification(req.params.userid, req.user._id)) {
     req.flash('error', 'Unauthorised')
@@ -170,27 +187,15 @@ router.get('/:userid/comments', function (req, res) {
 })
 
   /* returns specific user's post */
-router.get('/:userid', function (req, res) {
-  User
-    .findOne({_id: req.params.userid})
-    .populate('posts')
-    .exec(function (err, myarticles) {
-      if (err) return res.status(500).render({errMsg: err})
-      res.render('post/articleview', {articles: myarticles})
-    })
-})
-
-/* returns all posts */
-router.get('/', function (req, res) {
-  Post.find({}).populate('user').exec(function (err, posts) {
-    if (err) {
-      req.flash('error', 'error loading homepage...:(')
-      res.status(500)
-    } else {
-      res.render('post/articleview', {articles: posts})
-    }
-  })
-})
+// router.get('/:userid', function (req, res) {
+//   User
+//     .findOne({_id: req.params.userid})
+//     .populate('posts')
+//     .exec(function (err, myarticles) {
+//       if (err) return res.status(500).render({errMsg: err})
+//       res.render('post/articleview', {articles: myarticles})
+//     })
+// })
 
 router.delete('/:userid/delete/:postid', (req, res) => {
   if (!userVerification(req.params.userid, req.user._id)) {
@@ -211,6 +216,18 @@ router.delete('/:userid/delete/:postid', (req, res) => {
       )
     })
   }
+})
+
+/* returns all posts */
+router.get('/', function (req, res) {
+  Post.find({}).populate('user').exec(function (err, posts) {
+    if (err) {
+      req.flash('error', 'error loading homepage...')
+      res.status(500)
+    } else {
+      res.render('post/articleview', {articles: posts})
+    }
+  })
 })
 
 module.exports = router

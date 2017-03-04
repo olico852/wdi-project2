@@ -16,6 +16,12 @@
         <li><a href=<%="/user/"+ currentUser._id +"/comments"%>>Your Comments</a></li>
         <li><a href=<%="/user/"+ currentUser._id +"/editprofile"%>>Edit Profile</a></li>
       </ul>
+      <form method="get" action="/user/post/search" class="navbar-form navbar-left" role="form">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Post search" name="words">
+        </div>
+        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+      </form>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/auth/logout"><span class="glyphicon glyphicon-log-in"></span>Logout</a></li>
       </ul>
